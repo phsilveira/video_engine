@@ -1,0 +1,25 @@
+{
+  "template": {
+    "src": "file:///C:/Users/ph/Documents/getting_started/getting_started.aep",
+    "composition": "MAIN"
+  },
+
+  "actions": {
+    "postrender": [
+      {
+        "module": "@nexrender/action-encode",
+        "preset": "mp4",
+        "output": "encoded.mp4",
+        "params": {
+          "-vcodec": "libx264",
+          "-r": 25
+        }
+      },
+      {
+        "module": "@nexrender/action-copy",
+        "input": "encoded.mp4",
+        "output": "C:/Users/ph/Documents/getting_started/result.mp4"
+      }
+    ]
+  }
+}
