@@ -109,6 +109,8 @@ venv/
 ENV/
 env.bak/
 venv.bak/
+venv_linux/
+venv_windows/
 
 # Spyder project settings
 .spyderproject
@@ -129,3 +131,5 @@ dmypy.json
 
 # .temp/
 .temp/
+temp/
+output/

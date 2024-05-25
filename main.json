@@ -1,9 +1,17 @@
 {
   "template": {
-    "src": "file:///C:/Users/ph/Documents/getting_started/getting_started.aep",
-    "composition": "MAIN"
+    "src": "file:///D:\\Downloads\\TemplateC_Marketing\\TemplateC_Marketing.aep",
+    "composition": "scene_02_intro"
   },
-
+  "assets":[
+    {
+      "composition": "scene_02_intro",
+      "type": "data",
+      "layerName": "Scene_02_build",
+      "property": "outPoint",
+      "expression": "layer.source.duration"
+      }
+  ],
   "actions": {
     "postrender": [
       {
@@ -18,7 +26,7 @@
       {
         "module": "@nexrender/action-copy",
         "input": "encoded.mp4",
-        "output": "C:/Users/ph/Documents/getting_started/result.mp4"
+        "output": "D:\\Downloads\\TemplateC_Marketing\\TemplateC_Marketing_scene_02_intro_outPoint.mp4"
       }
     ]
   }

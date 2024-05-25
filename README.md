@@ -65,3 +65,11 @@ This package was created with Cookiecutter and the `gerardrbentley/cookiecutter-
 
 - Cookiecutter: [https://github.com/audreyr/cookiecutter](https://github.com/audreyr/cookiecutter)
 - `gerardrbentley/cookiecutter-streamlit`: [https://github.com/gerardrbentley/cookiecutter-streamlit](https://github.com/gerardrbentley/cookiecutter-streamlit)
+
+## How to use
+
+ffmpeg -f concat -safe 0 -i input.txt -c copy input_video.mp4
+
+bash run.bash
+
+ffmpeg -f concat -safe 0 -i input2.txt -c copy output_video2.mp4
