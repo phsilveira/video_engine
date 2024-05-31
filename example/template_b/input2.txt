@@ -1,0 +1,2 @@
+file '..\..\output\output.mp4'
+file '..\..\output\Cursos_Template_C__scene_16_brand_signature.mp4'

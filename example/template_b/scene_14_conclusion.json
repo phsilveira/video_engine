@@ -1,0 +1,53 @@
+{
+    "template": {
+      "src": "file:///D:\\Downloads\\Cursos_Template_B_v3\\Cursos_Template_B.aep",
+      "composition": "scene_14_conclusion"
+    },
+    "assets":[
+        {
+            "type": "video",
+            "layerName": "avatar_video_url",
+            "src": "{avatar_video_url}",
+            "params": {
+                "cachePath": "/tmp/my-nexrender-cache"
+            }
+        },
+        {
+            "composition": "scene_14_conclusion",
+            "type": "data",
+            "layerName": "avatar_video_url",
+            "property": "containingComp.workAreaDuration",
+            "expression": "layer.source.duration"
+        },
+        {
+            "type": "data",
+            "layerName": "text_2",
+            "property": "Source Text",
+            "value": "{text_2}"
+        },
+        {
+            "type": "data",
+            "layerName": "text_1",
+            "property": "Source Text",
+            "value": "{text_1}"
+        }
+    ],
+    "actions": {
+      "postrender": [
+        {
+          "module": "@nexrender/action-encode",
+          "preset": "mp4",
+          "output": "encoded.mp4",
+          "params": {
+            "-vcodec": "libx264",
+            "-r": 25
+          }
+        },
+        {
+          "module": "@nexrender/action-copy",
+          "input": "encoded.mp4",
+          "output": "C:\\Users\\ph\\Documents\\apoia\\video_engine\\output\\Cursos_Template_B__scene_14_conclusion.mp4"
+        }
+      ]
+    }
+  }
