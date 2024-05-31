@@ -41,6 +41,24 @@ def generate_scene_json(row, composition, template="Cursos_Template_B", project_
                 "value": "{text_1}"
             },
             {
+                "type": "data",
+                "layerName": "text_2",
+                "property": "Source Text",
+                "value": "{text_2}"
+            },
+            {
+                "type": "data",
+                "layerName": "text_3",
+                "property": "Source Text",
+                "value": "{text_3}"
+            },
+            {
+                "type": "data",
+                "layerName": "text_4",
+                "property": "Source Text",
+                "value": "{text_4}"
+            },
+            {
                 "type": "audio",
                 "layerName": "narration_audio_url",
                 "src": "{narration_audio_url}",
@@ -173,8 +191,8 @@ def main():
             scenes_path.append(output_video_path)
 
         # export scenes path to .txt
-        with open(f'output/scenes_script_to_render.txt', 'w') as f:
-            for item in scenes_script_to_render:
+        with open(f'output/scenes_to_render.txt', 'w') as f:
+            for item in scenes_path:
                 f.write("file '%s'\n" % item)
 
         st.success('All files have been generated successfully!')
@@ -199,28 +217,47 @@ def main():
                 process.stdout.close()
 
         with st.spinner('Merging the videos...'):
-            command = f'ffmpeg -y -f concat -safe 0 -i output/scenes_to_render.txt -c copy output/output.mp4'
+            command = f'ffmpeg -y -f concat -safe 0 -i C:/Users/ph/Documents/apoia/video_engine/output/scenes_to_render.txt -c copy C:/Users/ph/Documents/apoia/video_engine/output/output.mp4'
+            process = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+            output_area = st.empty()
+
+            for line in iter(process.stdout.readline, b''):
+                output_area.text(line.decode())
+                print(line.decode())
+                if 'rendering complete!' in line.decode():
+                    break
+            process.stdout.close()
+
+            command = f'ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 C:/Users/ph/Documents/apoia/video_engine/output/output.mp4'
             process = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
 
-            # output_area = st.empty()
-
-            # for line in iter(process.stdout.readline, b''):
-            #     output_area.text(line.decode())
-            #     print(line.decode())
-            #     if 'rendering complete!' in line.decode():
-            #         break
-            # process.stdout.close()
-
-            command = f'ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 output/output.mp4'
-            process = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-
-            video_duration = float(process.stdout.read().decode())
+            video_duration = process.stdout.read().decode()
+            video_duration = float(video_duration)
             fade_out_start = video_duration - 2
 
-            command = f'ffmpeg -y -stream_loop -1 -i {templates[selected_template]["audio_path"]} -i output/output.mp4 -filter_complex "[0:a]volume=0.1[a];[a]afade=t=out:st={fade_out_start}:d=2[a1];[1:a][a1]amix=inputs=2:duration=first:dropout_transition=2[aout]" -map 1:v -map "[aout]" -c:v copy -c:a aac output/output2.mp4'
+            command = f'ffmpeg -y -stream_loop -1 -i {templates[selected_template]["audio_path"]} -i C:/Users/ph/Documents/apoia/video_engine/output/output.mp4 -filter_complex "[0:a]volume=0.1[a];[a]afade=t=out:st={fade_out_start}:d=2[a1];[1:a][a1]amix=inputs=2:duration=first:dropout_transition=2[aout]" -map 1:v -map "[aout]" -c:v copy -c:a aac C:/Users/ph/Documents/apoia/video_engine/output/output2.mp4'
             process = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
 
-            command = 'ffmpeg -y -f concat -safe 0 -i output/final_merge.txt -c copy output/output_final.mp4'
+            output_area = st.empty()
+
+            for line in iter(process.stdout.readline, b''):
+                output_area.text(line.decode())
+                print(line.decode())
+                if 'rendering complete!' in line.decode():
+                    break
+            process.stdout.close()
+
+            command = 'ffmpeg -y -f concat -safe 0 -i C:/Users/ph/Documents/apoia/video_engine/output/final_merge.txt -c copy C:/Users/ph/Documents/apoia/video_engine/output/output_final.mp4'
+            process = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+
+            output_area = st.empty()
+
+            for line in iter(process.stdout.readline, b''):
+                output_area.text(line.decode())
+                print(line.decode())
+                if 'rendering complete!' in line.decode():
+                    break
+            process.stdout.close()
 
         process_running = False
 
