@@ -3,9 +3,10 @@ import streamlit as st
 import pandas as pd
 import json
 import os
+import time
 
 
-def generate_scene_json(row, composition, template="Cursos_Template_B", project_template_path='D:\\Downloads\\Cursos_Template_B_v3\\', output_path="C:\\Users\\ph\\Documents\\apoia\\video_engine\\output\\"):
+def generate_scene_json(row, composition, template="Cursos_Template_B", project_template_path='C:\\Users\Administrator\\Downloads\\Cursos_Template_B_v3\\', output_path="C:\\Users\\Administrator\\Documents\\video_engine\\output\\"):
     output_path = f"{output_path}{template}__{composition}.mp4"
     base_contract = {
         "template": {
@@ -150,14 +151,17 @@ def main():
     templates = {
         'Template C': {
             'name':'Cursos_Template_C',
-            'project_template_path':'D:\\Downloads\\Cursos_Template_C_v6\\',
-            'audio_path':'C:\\Users\\ph\\Documents\\apoia\\video_engine\\example\\template_c\\input_audio.wav'
+            'project_template_path':'C:\\Users\Administrator\\Downloads\\Cursos_Template_C_v7\\',
+            'audio_path':'C:\\Users\\Administrator\\Documents\\video_engine\\example\\template_c\\input_audio.mp4'
         },
         'Template B': {
             'name':'Cursos_Template_B',
-            'project_template_path':'D:\\Downloads\\Cursos_Template_B_v3\\',
-            'audio_path':'C:\\Users\\ph\\Documents\\apoia\\video_engine\\example\\template_b\\input_audio.mp3'
+            'project_template_path':'C:\\Users\Administrator\\Downloads\\Cursos_Template_B_v3\\',
+            'audio_path':'C:\\Users\\Administrator\\Documents\\video_engine\\example\\template_b\\input_audio.mp3'
         },
+        # '1.4.4 - Course summary - Quiz interativo': {
+        #     ''
+        # }
     }
 
     selected_template = st.selectbox('Select a template', list(templates.keys()))
@@ -190,6 +194,9 @@ def main():
             scenes_script_to_render.append(output_file_path)
             scenes_path.append(output_video_path)
 
+        scenes_script_to_render.pop()
+        scenes_path.pop()
+
         # export scenes path to .txt
         with open(f'output/scenes_to_render.txt', 'w') as f:
             for item in scenes_path:
@@ -201,23 +208,25 @@ def main():
 
     if uploaded_file is not None and st.button('Start Process'):
         process_running = True
+        start = time.time()
 
         for scene in scenes_script_to_render:
             with st.spinner(f'Running the batch file for {scene}...'):
-                command = f'C:\\Users\\ph\\Documents\\apoia\\video_engine\\nexrender-cli-win64.exe --file {scene} --binary "C:\\Program Files\\Adobe\\Adobe After Effects 2024\\Support Files\\aerender.exe" --skip-cleanup'
+                command = f'C:\\Users\\Administrator\\Documents\\video_engine\\nexrender-cli-win64.exe --file {scene} --binary "C:\\Program Files\\Adobe\\Adobe After Effects 2024\\Support Files\\aerender.exe" --skip-cleanup'
                 process = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
 
                 output_area = st.empty()
 
                 for line in iter(process.stdout.readline, b''):
                     output_area.text(line.decode())
+                    # output_area.text(f"Comp {scene}: {line.decode()}")
                     print(line.decode())
                     if 'rendering complete!' in line.decode():
                         break
                 process.stdout.close()
 
         with st.spinner('Merging the videos...'):
-            command = f'ffmpeg -y -f concat -safe 0 -i C:/Users/ph/Documents/apoia/video_engine/output/scenes_to_render.txt -c copy C:/Users/ph/Documents/apoia/video_engine/output/output.mp4'
+            command = f'ffmpeg -y -f concat -safe 0 -i C:/Users/Administrator/Documents/video_engine/output/scenes_to_render.txt -c copy C:/Users/Administrator/Documents/video_engine/output/output.mp4'
             process = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
             output_area = st.empty()
 
@@ -228,14 +237,14 @@ def main():
                     break
             process.stdout.close()
 
-            command = f'ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 C:/Users/ph/Documents/apoia/video_engine/output/output.mp4'
+            command = f'ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 C:/Users/Administrator/Documents/video_engine/output/output.mp4'
             process = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
 
             video_duration = process.stdout.read().decode()
             video_duration = float(video_duration)
             fade_out_start = video_duration - 2
 
-            command = f'ffmpeg -y -stream_loop -1 -i {templates[selected_template]["audio_path"]} -i C:/Users/ph/Documents/apoia/video_engine/output/output.mp4 -filter_complex "[0:a]volume=0.1[a];[a]afade=t=out:st={fade_out_start}:d=2[a1];[1:a][a1]amix=inputs=2:duration=first:dropout_transition=2[aout]" -map 1:v -map "[aout]" -c:v copy -c:a aac C:/Users/ph/Documents/apoia/video_engine/output/output2.mp4'
+            command = f'ffmpeg -y -stream_loop -1 -i {templates[selected_template]["audio_path"]} -i C:/Users/Administrator/Documents/video_engine/output/output.mp4 -filter_complex "[0:a]volume=1[a];[a]afade=t=out:st={fade_out_start}:d=2[a1];[1:a][a1]amix=inputs=2:duration=first:dropout_transition=2[aout]" -map 1:v -map "[aout]" -c:v copy -c:a aac C:/Users/Administrator/Documents/video_engine/output/output2.mp4'
             process = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
 
             output_area = st.empty()
@@ -247,7 +256,7 @@ def main():
                     break
             process.stdout.close()
 
-            command = 'ffmpeg -y -f concat -safe 0 -i C:/Users/ph/Documents/apoia/video_engine/output/final_merge.txt -c copy C:/Users/ph/Documents/apoia/video_engine/output/output_final.mp4'
+            command = 'ffmpeg -y -f concat -safe 0 -i C:/Users/Administrator/Documents/video_engine/output/final_merge.txt -c copy C:/Users/Administrator/Documents/video_engine/output/output_final.mp4'
             process = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
 
             output_area = st.empty()
@@ -260,11 +269,12 @@ def main():
             process.stdout.close()
 
         process_running = False
+        end = time.time()
 
-        st.success('Render complete successfully!')
+        st.success(f'Render complete successfully in {round(end-start, 2)}!')
 
         # Display the video
-        video_file = 'output/output_final.mp4'
+        video_file = 'C:/Users/Administrator/Documents/video_engine/output/output_final.mp4'
         st.video(video_file)
 
         # Allow the user to download the video
