@@ -212,7 +212,7 @@ def main():
 
         for scene in scenes_script_to_render:
             with st.spinner(f'Running the batch file for {scene}...'):
-                command = f'C:\\Users\\Administrator\\Documents\\video_engine\\nexrender-cli-win64.exe --file {scene} --binary "C:\\Program Files\\Adobe\\Adobe After Effects 2024\\Support Files\\aerender.exe" --skip-cleanup'
+                command = f'C:\\Users\\Administrator\\Documents\\video_engine\\nexrender-cli-win64.exe --file {scene} --binary "C:\\Program Files\\Adobe\\Adobe After Effects 2024\\Support Files\\aerender.exe"'
                 process = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
 
                 output_area = st.empty()
